@@ -129,4 +129,14 @@ public class ReflectUtil {
     }
 
 
+    public static boolean existsClass(final String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (final ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+
 }

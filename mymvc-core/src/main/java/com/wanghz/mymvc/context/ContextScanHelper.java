@@ -1,6 +1,7 @@
 package com.wanghz.mymvc.context;
 
 import com.wanghz.mymvc.annotation.*;
+import com.wanghz.mymvc.common.util.SqlSessionFactoryUtil;
 import com.wanghz.mymvc.common.util.VariableUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +36,9 @@ public class ContextScanHelper {
     public static final Map<String, Method> urlMethodMap = new HashMap<>();
     // method和全限定类名映射关系 通过method找到方法对象利用反射执行
     public static final Map<Method, String> methodPackageMap = new HashMap<>();
+
+    // DAO层注解实例化 注解名称: 实例化对象
+    public static final Map<String, Object> DAOMap = new HashMap<>();
 
     public static final String CONFIG_LOCATION_PARAM = "contextConfigLocation";
 
@@ -79,8 +82,9 @@ public class ContextScanHelper {
      */
     public static void scanBasePackage(String basePackage) {
 //        URL url = this.getClass().getClassLoader().getResource(basePackage.replace(".", "/"));
-        URL url = Thread.currentThread().getContextClassLoader().getResource(basePackage.replace(".", "/"));
-        File basePackageFile = new File(url.getPath());
+//        URL url = Thread.currentThread().getContextClassLoader().getResource(basePackage.replace(".", "/"));
+        String path = ContextScanHelper.class.getClassLoader().getResource(basePackage.replace(".", "/")).getPath();
+        File basePackageFile = new File(path);
         System.out.println("scan: " + basePackageFile);
         File[] childFiles = basePackageFile.listFiles();
         if (childFiles != null) {
@@ -93,6 +97,12 @@ public class ContextScanHelper {
                 }
             }
         }
+        /*try {
+            JarFile jarFile = new JarFile(path);
+            JarFile[] childJarFiles = jarFile.listFiles();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
     }
 
     /**
@@ -126,8 +136,8 @@ public class ContextScanHelper {
             } else if (clazz.isAnnotationPresent(Repository.class)) {
                 Repository repository = (Repository) clazz.getAnnotation(Repository.class);
                 String repositoryName = repository.value();
-
-                instanceMap.put(repositoryName, clazz.newInstance());
+                DAOMap.put(repositoryName, clazz);
+                instanceMap.put(repositoryName, clazz);
                 nameMap.put(packageName, repositoryName);
                 System.out.println("Repository: " + packageName + ", value: " + repositoryName);
             }
@@ -144,9 +154,18 @@ public class ContextScanHelper {
             Field[] fields = entry.getValue().getClass().getDeclaredFields();
             for (Field field : fields) {
                 if (field.isAnnotationPresent(Qualifier.class)) {
-                    String name = field.getAnnotation(Qualifier.class).value();
-                    field.setAccessible(true);
-                    field.set(entry.getValue(), instanceMap.get(name));
+                    if (field.getType().isAnnotationPresent(Repository.class)
+                            && field.getType().isAnnotationPresent(Repository.class)) {
+                        String name = field.getAnnotation(Qualifier.class).value();
+                        field.setAccessible(true);
+//                        field.set(SqlSessionFactoryUtil.sqlSession.getMapper(field.getType()), instanceMap.get(name));
+                        field.set(entry.getValue(), SqlSessionFactoryUtil.sqlSession.getMapper(field.getType()));
+                    } else {
+                        String name = field.getAnnotation(Qualifier.class).value();
+                        field.setAccessible(true);
+                        field.set(entry.getValue(), instanceMap.get(name));
+                    }
+
                 }
             }
         }
