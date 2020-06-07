@@ -1,4 +1,4 @@
-package com.wanghz.mymvc.controller;
+package com.wanghz.mymvc.webtest.controller;
 
 public class User {
     private String name;

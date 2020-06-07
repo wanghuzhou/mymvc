@@ -1,4 +1,4 @@
-package com.wanghz.mymvc.controller;
+package com.wanghz.mymvc.webtest.controller;
 
 import com.wanghz.mymvc.annotation.Controller;
 import com.wanghz.mymvc.annotation.RequestMapping;
