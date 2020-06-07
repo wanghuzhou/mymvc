@@ -15,4 +15,14 @@ public class TestController {
     public ResponseBean test(HttpServletRequest request, HttpServletResponse response) {
         return ResponseBean.ofSuccess("我的springmvc框架");
     }
+
+    @RequestMapping("/hello")
+    public ResponseBean hello(String name, int age) {
+        return ResponseBean.ofSuccess("hello:" + name + ", age:" + age);
+    }
+
+    @RequestMapping("/hello/user")
+    public ResponseBean helloUser(User user) {
+        return ResponseBean.ofSuccess("hello:" + user);
+    }
 }

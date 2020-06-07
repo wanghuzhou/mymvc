@@ -13,7 +13,7 @@ public class ContextLoaderListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        ContextScanHelper.initContext();
+        ContextScanHelper.initContext(sce);
     }
 
     @Override
