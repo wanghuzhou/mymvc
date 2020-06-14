@@ -37,4 +37,10 @@ public class TestController {
         user = userMapper.getUserByID(user.getId());
         return ResponseBean.ofSuccess(user);
     }
+
+    @RequestMapping("/test1")
+    public ResponseBean test1(User user, String city) {
+        user.setCity(city);
+        return ResponseBean.ofSuccess(user);
+    }
 }

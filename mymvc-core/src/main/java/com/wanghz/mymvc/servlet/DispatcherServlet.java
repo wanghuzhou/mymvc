@@ -44,6 +44,9 @@ public class DispatcherServlet extends HttpServlet {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e;
             }
         }
     }

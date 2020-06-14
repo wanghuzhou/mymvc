@@ -154,9 +154,8 @@ public class ContextScanHelper {
             Field[] fields = entry.getValue().getClass().getDeclaredFields();
             for (Field field : fields) {
                 if (field.isAnnotationPresent(Qualifier.class)) {
-                    if (field.getType().isAnnotationPresent(Repository.class)
-                            && field.getType().isAnnotationPresent(Repository.class)) {
-                        String name = field.getAnnotation(Qualifier.class).value();
+                    if (field.getType().isAnnotationPresent(Repository.class)) {
+//                        String name = field.getAnnotation(Qualifier.class).value();
                         field.setAccessible(true);
 //                        field.set(SqlSessionFactoryUtil.sqlSession.getMapper(field.getType()), instanceMap.get(name));
                         field.set(entry.getValue(), SqlSessionFactoryUtil.sqlSession.getMapper(field.getType()));

@@ -6,8 +6,12 @@ import com.wanghz.mymvc.exception.ParameterConvertException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +31,7 @@ public class ReflectUtil {
         Parameter[] parameters = method.getParameters();
         Class<?>[] clazzArr = method.getParameterTypes();
         Object[] tmpParameters = new Object[parameters.length];
+        JSONObject jsonObject = JSON.parseObject(getReqBodyString(request));
 
         for (int i = 0; i < parameters.length; i++) {
             Parameter param = parameters[i];
@@ -41,7 +46,7 @@ public class ReflectUtil {
                 }
             }*/
             try {
-                tmpParameters[i] = wrapRealParameter(clazzArr[i], paramName, request, response);
+                tmpParameters[i] = wrapRealParameter(clazzArr[i], paramName, jsonObject, request, response);
             } catch (ParameterConvertException e) {
                 e.printStackTrace();
             }
@@ -50,7 +55,7 @@ public class ReflectUtil {
         return tmpParameters;
     }
 
-    public static Object wrapRealParameter(Class<?> clazz, String paramName, HttpServletRequest request, HttpServletResponse response) throws ParameterConvertException {
+    public static Object wrapRealParameter(Class<?> clazz, String paramName, JSONObject jsonObject, HttpServletRequest request, HttpServletResponse response) throws ParameterConvertException {
 
         if (clazz.equals(HttpServletRequest.class)) {
             return request;
@@ -65,31 +70,37 @@ public class ReflectUtil {
                 break;
             }
         }
-        String value = request.getParameter(paramName);
+        String value;
+        String type = request.getHeader("Content-Type") != null
+                && request.getHeader("Content-Type").startsWith("application/json") ? "json" : "form";
+        if (type.equals("json")) {
+            value = jsonObject.getString(paramName);
+        } else {
+            value = request.getParameter(paramName);
+        }
         Object object = null;
         try {
             if (isNormalType) {
 
                 if (clazz.equals(String.class)) {
                     object = value;
-                }
-                else if (clazz.equals(int.class) || clazz.equals(Integer.class)) {
+                } else if (clazz.equals(int.class) || clazz.equals(Integer.class)) {
                     object = Integer.parseInt(value);
-                }
-                else if (clazz.equals(float.class) || clazz.equals(Float.class)) {
+                } else if (clazz.equals(float.class) || clazz.equals(Float.class)) {
                     object = Float.parseFloat(value);
-                }
-                else if (clazz.equals(double.class) || clazz.equals(Double.class)) {
+                } else if (clazz.equals(double.class) || clazz.equals(Double.class)) {
                     object = Double.parseDouble(value);
-                }
-                else if (clazz.equals(short.class) || clazz.equals(Short.class)) {
+                } else if (clazz.equals(short.class) || clazz.equals(Short.class)) {
                     object = Short.parseShort(value);
-                }
-                else if (clazz.equals(byte.class) || clazz.equals(Byte.class)) {
+                } else if (clazz.equals(byte.class) || clazz.equals(Byte.class)) {
                     object = Byte.parseByte(value);
                 }
             } else {
-                object = JSON.parseObject(request2Json(request).toJSONString(), clazz);
+                if (type.equals("json")) {
+                    object = JSON.parseObject(value, clazz);
+                } else {
+                    object = JSON.parseObject(request2Json(request).toJSONString(), clazz);
+                }
             }
         } catch (Exception e) {
 //            systemErrorTracelogger.error("[ {} ] 参数:[ {} ] 实参内容:[ {} ] 格式化出错", controllerInfo.getReqUrl(),parameterInfo.getParamaterName(), value, e);
@@ -98,6 +109,30 @@ public class ReflectUtil {
         return object;
 
     }
+
+    public static String getReqBodyString(HttpServletRequest request) {
+
+        int length = request.getContentLength();
+        if (length <= 0) {
+            return "";
+        }
+
+        BufferedReader br = null;
+        try {
+//            br = request.getReader();
+            br = new BufferedReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            String str;
+            while (null != (str = br.readLine())) {
+                sb.append(str);
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     public static Map<String, Object> req2Map(HttpServletRequest request) {
         Map<String, Object> map = new HashMap<>();
