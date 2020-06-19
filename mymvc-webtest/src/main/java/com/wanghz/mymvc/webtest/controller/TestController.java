@@ -6,16 +6,20 @@ import com.wanghz.mymvc.annotation.RequestMapping;
 import com.wanghz.mymvc.domain.ResponseBean;
 import com.wanghz.mymvc.webtest.dao.UserMapper;
 import com.wanghz.mymvc.webtest.entity.User;
+import com.wanghz.mymvc.webtest.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@Controller("testController")
+@Controller
 @RequestMapping("/test")
 public class TestController {
 
     @Qualifier("userMapper")
     private UserMapper userMapper;
+
+    @Qualifier("userService")
+    private UserService userService;
 
     @RequestMapping("/test")
     public ResponseBean test(HttpServletRequest request, HttpServletResponse response) {
@@ -34,7 +38,8 @@ public class TestController {
 
     @RequestMapping("/jdbctest")
     public ResponseBean jdbctest(User user) {
-        user = userMapper.getUserByID(user.getId());
+//        user = userMapper.getUserByID(user.getId());
+        user = userService.getUserByID(user.getId());
         return ResponseBean.ofSuccess(user);
     }
 

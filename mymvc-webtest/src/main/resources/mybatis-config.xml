@@ -33,25 +33,25 @@
 	<environments default="development">
 		<environment id="development">
 			<transactionManager type="JDBC"/>
-			<dataSource type="POOLED">
-				<property name="driver" value="${jdbc.driver}"/>
-				<property name="url" value="${jdbc.url}"/>
-				<property name="username" value="${jdbc.username}"/>
-				<property name="password" value="${jdbc.password}"/>
-			</dataSource>
-			<!--<dataSource type="com.util.DBCPDataSourceFactory">
+			<!--<dataSource type="POOLED">
 				<property name="driver" value="${jdbc.driver}"/>
 				<property name="url" value="${jdbc.url}"/>
 				<property name="username" value="${jdbc.username}"/>
 				<property name="password" value="${jdbc.password}"/>
 			</dataSource>-->
+			<dataSource type="com.wanghz.mymvc.webtest.config.DruidDataSourceFactory">
+				<property name="druid.driverClassName" value="${jdbc.driver}"/>
+				<property name="druid.url" value="${jdbc.url}"/>
+				<property name="druid.username" value="${jdbc.username}"/>
+				<property name="druid.password" value="${jdbc.password}"/>
+			</dataSource>
 		</environment>
 	</environments>
 
 	<mappers>
-		<mapper resource="mapper/UserMapper.xml"/>
+		<!--		<mapper resource="mapper/UserMapper.xml"/>-->
 		<!-- Mapper扫描包，必须同目录同名称下-->
-<!--				<package name="com.mapper.UserMapper"/>-->
+		<package name="com.wanghz.mymvc.webtest.dao"/>
 	</mappers>
 
 

@@ -120,8 +120,7 @@ public class ContextScanHelper {
         for (String packageName : packageNames) {
             Class clazz = Class.forName(packageName);
             if (clazz.isAnnotationPresent(Controller.class)) {
-                Controller controller = (Controller) clazz.getAnnotation(Controller.class);
-                String controllerName = controller.value();
+                String controllerName = clazz.getName();
 
                 instanceMap.put(controllerName, clazz.newInstance());
                 nameMap.put(packageName, controllerName);
