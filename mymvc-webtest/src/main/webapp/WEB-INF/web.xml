@@ -6,7 +6,13 @@
     <description>
         Welcome to MyMvc
     </description>
-
+    <listener>
+        <listener-class>org.apache.logging.log4j.web.Log4jServletContextListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>log4jConfiguration</param-name>
+        <param-value>classpath:log4j2.xml</param-value>
+    </context-param>
     <listener>
         <listener-class>com.wanghz.mymvc.context.ContextLoaderListener</listener-class>
     </listener>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="60">
+    <Properties>
+        <Property name="log.path" value="D:/log/mymvc"/>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}][%p][ reqCode:%X{reqCode}] [%t] [%c] - %m%n"/> <!-- 定义类型为Pattern的Layout -->
+        </Console>
+
+        <RollingFile name="InfoFile"
+                     fileName="${log.path}/root.info.log"
+                     filePattern="${log.path}/backups/root-%d{yyyy-MM-dd-HH}.log">
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}][%p][reqCode:%X{reqCode}] [%t] [%c] - %m%n"/>
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
+            <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+        <RollingFile name="mymvc"
+                     fileName="${log.path}/mymvc.info.log"
+                     filePattern="${log.path}/backups/mymvc-%d{yyyy-MM-dd-HH}.log">
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}][%p][reqCode:%X{reqCode}] [%t] [%c] - %m%n"/>
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
+            <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+        <RollingRandomAccessFile name="ErrorFile"
+                                 fileName="${log.path}/error.log"
+                                 filePattern="${log.path}/backups/error-%d{yyyy-MM-dd}.log">
+            <Filters>
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY" />
+            </Filters>
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}][%p][reqCode:%X{reqCode}] [%t] [%c] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+
+            </Policies>
+            <DefaultRolloverStrategy max="20" />
+        </RollingRandomAccessFile>
+
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="InfoFile"/>
+            <AppenderRef ref="ErrorFile"/>
+        </Root>
+        <Logger name="org.apache.ibatis" level="info" additivity="true">
+            <AppenderRef ref="mymvc"/>
+        </Logger>
+    </Loggers>
+</Configuration>
