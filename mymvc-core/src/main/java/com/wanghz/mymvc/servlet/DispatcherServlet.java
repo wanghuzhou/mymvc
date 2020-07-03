@@ -53,7 +53,7 @@ public class DispatcherServlet extends HttpServlet {
             try {
                 ThreadContext.put("reqCode", UUID.randomUUID().toString());
                 Object[] objects = ReflectUtil.getRealParameters(method, req, resp);
-                logger.info("入参：{}", JSON.toJSONString(objects));
+//                logger.info("入参：{}", JSON.toJSONString(objects));//当参数为request，无法json序列化
                 Object obj = method.invoke(controller, objects);
                 String jsonStr = JSON.toJSONString(obj);
                 resp.setContentType("application/json;charset=UTF-8");
