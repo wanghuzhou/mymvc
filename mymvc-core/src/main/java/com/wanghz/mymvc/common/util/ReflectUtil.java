@@ -3,6 +3,9 @@ package com.wanghz.mymvc.common.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.wanghz.mymvc.exception.ParameterConvertException;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +26,8 @@ import java.util.Map;
  */
 public class ReflectUtil {
 
+    static Logger logger = LoggerFactory.getLogger(ReflectUtil.class);
+
     public static Class[] normalTypeList = new Class[]{String.class, int.class, Integer.class, float.class, Float.class,
             double.class, Double.class, char.class, short.class, Short.class};
 
@@ -31,20 +36,15 @@ public class ReflectUtil {
         Parameter[] parameters = method.getParameters();
         Class<?>[] clazzArr = method.getParameterTypes();
         Object[] tmpParameters = new Object[parameters.length];
-        JSONObject jsonObject = JSON.parseObject(getReqBodyString(request));
+        String bodyStr = getReqBodyString(request);
+        JSONObject jsonObject = StringUtils.isNotBlank(bodyStr) && bodyStr.trim().indexOf("{") == 0
+                ? JSON.parseObject(getReqBodyString(request)) : null;
+        logger.info("body入参：{}\n表单入参：{}", bodyStr, JSON.toJSONString(req2Map(request)));
 
         for (int i = 0; i < parameters.length; i++) {
             Parameter param = parameters[i];
-
             String paramName = param.getName();
 
-            /*for (Class<?> clazz : clazzArr) {
-                try {
-                    tmpParameters[i] = wrapRealParameter(clazz, paramName, request, response);
-                } catch (ParameterConvertException e) {
-                    e.printStackTrace();
-                }
-            }*/
             try {
                 tmpParameters[i] = wrapRealParameter(clazzArr[i], paramName, jsonObject, request, response);
             } catch (ParameterConvertException e) {
