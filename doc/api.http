@@ -1,0 +1,13 @@
+###
+// @no-log
+POST http://localhost:8080/test/getReqInfo
+Content-Type: application/x-www-form-urlencoded
+
+name=www&pwd=12213
+
+###
+// @no-log
+POST http://localhost:8080/test/getReqInfo
+Content-Type: application/json
+
+{"name": "wwww", "pwd": "123456"}

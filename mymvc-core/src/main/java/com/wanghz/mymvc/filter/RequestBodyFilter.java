@@ -14,12 +14,11 @@ public class RequestBodyFilter implements Filter {
         ServletRequest requestWrapper = null;
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
-        if (request instanceof HttpServletRequest) {
-            requestWrapper = new BodyReaderHttpServletRequestWrapper((HttpServletRequest) request);
-        }
-        if (null == requestWrapper) {
+
+        if (((HttpServletRequest) request).getHeader("Content-Type").contains("form")) {
             chain.doFilter(request, response);
         } else {
+            requestWrapper = new BodyReaderHttpServletRequestWrapper((HttpServletRequest) request);
             chain.doFilter(requestWrapper, response);
         }
     }

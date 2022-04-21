@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,9 +38,10 @@ public class ReflectUtil {
         Class<?>[] clazzArr = method.getParameterTypes();
         Object[] tmpParameters = new Object[parameters.length];
         String bodyStr = getReqBodyString(request);
-        JSONObject jsonObject = StringUtils.isNotBlank(bodyStr) && bodyStr.trim().indexOf("{") == 0
-                ? JSON.parseObject(getReqBodyString(request)) : null;
-        logger.info("body入参：{}\n表单入参：{}", bodyStr, JSON.toJSONString(req2Map(request)));
+        String formStr = reqFormString(request);
+        JSONObject jsonObject = StringUtils.isNotBlank(bodyStr) && bodyStr.trim().startsWith("{")
+                ? JSON.parseObject(bodyStr) : null;
+        logger.info("body入参：{}\n表单入参：{}", bodyStr, formStr);
 
         for (int i = 0; i < parameters.length; i++) {
             Parameter param = parameters[i];
@@ -112,6 +114,10 @@ public class ReflectUtil {
 
     public static String getReqBodyString(HttpServletRequest request) {
 
+        if (request.getHeader("Content-type").contains("form")) {
+            return reqFormString(request);
+        }
+
         int length = request.getContentLength();
         if (length <= 0) {
             return "";
@@ -138,6 +144,12 @@ public class ReflectUtil {
         Map<String, Object> map = new HashMap<>();
         request.getParameterMap().forEach((key, value) -> map.put(key, value[0]));
         return map;
+    }
+
+    public static String reqFormString(HttpServletRequest request) {
+        StringBuilder sb = new StringBuilder();
+        request.getParameterMap().forEach((key, value) -> sb.append(key).append("=").append(Arrays.toString(value)));
+        return sb.toString();
     }
 
     /**
