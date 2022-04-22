@@ -11,3 +11,10 @@ POST http://localhost:8080/test/getReqInfo
 Content-Type: application/json
 
 {"name": "wwww", "pwd": "123456"}
+
+###
+// @no-log
+POST http://localhost:8080/test/jdbctest
+Content-Type: application/x-www-form-urlencoded
+
+id=1

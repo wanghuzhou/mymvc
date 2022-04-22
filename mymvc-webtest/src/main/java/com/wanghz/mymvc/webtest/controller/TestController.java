@@ -1,7 +1,7 @@
 package com.wanghz.mymvc.webtest.controller;
 
 import com.wanghz.mymvc.annotation.Controller;
-import com.wanghz.mymvc.annotation.Qualifier;
+import com.wanghz.mymvc.annotation.Autowired;
 import com.wanghz.mymvc.annotation.RequestMapping;
 import com.wanghz.mymvc.common.util.ReflectUtil;
 import com.wanghz.mymvc.domain.ResponseBean;
@@ -19,10 +19,10 @@ import java.util.Map;
 @RequestMapping("/test")
 public class TestController {
 
-    @Qualifier("userMapper")
+    @Autowired("userMapper")
     private UserMapper userMapper;
 
-    @Qualifier("userService")
+    @Autowired("userService")
     private UserService userService;
 
     @RequestMapping("/test")
