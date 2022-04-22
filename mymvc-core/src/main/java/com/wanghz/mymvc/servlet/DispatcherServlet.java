@@ -1,7 +1,7 @@
 package com.wanghz.mymvc.servlet;
 
-import com.alibaba.fastjson.JSON;
 import com.wanghz.mymvc.common.enums.ResponseCode;
+import com.wanghz.mymvc.common.util.JsonUtil;
 import com.wanghz.mymvc.common.util.ReflectUtil;
 import com.wanghz.mymvc.context.ContextScanHelper;
 import com.wanghz.mymvc.domain.ResponseBean;
@@ -55,7 +55,7 @@ public class DispatcherServlet extends HttpServlet {
                 Object[] objects = ReflectUtil.getRealParameters(method, req, resp);
 //                logger.info("入参：{}", JSON.toJSONString(objects));//当参数为request，无法json序列化
                 Object obj = method.invoke(controller, objects);
-                String jsonStr = JSON.toJSONString(obj);
+                String jsonStr = JsonUtil.toJSONString(obj);
                 resp.setContentType("application/json;charset=UTF-8");
                 resp.getWriter().write(jsonStr);
                 logger.info("出参：{}", jsonStr);
@@ -67,7 +67,7 @@ public class DispatcherServlet extends HttpServlet {
                 resp.getWriter().write(JSON.toJSONString(ResponseBean.ofError(ResponseCode.UNKNOWN_ERROR)));
             }*/ catch (Exception e) {
                 Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
-                resp.getWriter().write(JSON.toJSONString(ResponseBean.ofError(ResponseCode.UNKNOWN_ERROR)));
+                resp.getWriter().write(JsonUtil.toJSONString(ResponseBean.ofError(ResponseCode.UNKNOWN_ERROR)));
             }
         }
     }

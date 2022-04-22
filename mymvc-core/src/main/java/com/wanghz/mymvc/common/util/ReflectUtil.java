@@ -1,7 +1,6 @@
 package com.wanghz.mymvc.common.util;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.wanghz.mymvc.exception.ParameterConvertException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -39,8 +38,8 @@ public class ReflectUtil {
         Object[] tmpParameters = new Object[parameters.length];
         String bodyStr = getReqBodyString(request);
         String formStr = reqFormString(request);
-        JSONObject jsonObject = StringUtils.isNotBlank(bodyStr) && bodyStr.trim().startsWith("{")
-                ? JSON.parseObject(bodyStr) : null;
+        JsonNode jsonObject = StringUtils.isNotBlank(bodyStr) && bodyStr.trim().startsWith("{")
+                ? JsonUtil.readTree(bodyStr) : null;
         logger.info("body入参：{}\n表单入参：{}", bodyStr, formStr);
 
         for (int i = 0; i < parameters.length; i++) {
@@ -57,7 +56,7 @@ public class ReflectUtil {
         return tmpParameters;
     }
 
-    public static Object wrapRealParameter(Class<?> clazz, String paramName, JSONObject jsonObject, HttpServletRequest request, HttpServletResponse response) throws ParameterConvertException {
+    public static Object wrapRealParameter(Class<?> clazz, String paramName, JsonNode jsonObject, HttpServletRequest request, HttpServletResponse response) throws ParameterConvertException {
 
         if (clazz.equals(HttpServletRequest.class)) {
             return request;
@@ -76,7 +75,7 @@ public class ReflectUtil {
         String type = request.getHeader("Content-Type") != null
                 && request.getHeader("Content-Type").startsWith("application/json") ? "json" : "form";
         if (type.equals("json")) {
-            value = jsonObject.getString(paramName);
+            value = jsonObject.get(paramName).asText();
         } else {
             value = request.getParameter(paramName);
         }
@@ -99,9 +98,9 @@ public class ReflectUtil {
                 }
             } else {
                 if (type.equals("json")) {
-                    object = JSON.parseObject(value, clazz);
+                    object = JsonUtil.parseObject(value, clazz);
                 } else {
-                    object = JSON.parseObject(request2Json(request).toJSONString(), clazz);
+                    object = JsonUtil.convertValue(req2Map(request), clazz);
                 }
             }
         } catch (Exception e) {
@@ -155,11 +154,11 @@ public class ReflectUtil {
     /**
      * 将request参数值转为json
      */
-    public static JSONObject request2Json(HttpServletRequest request) {
-        JSONObject requestJson = new JSONObject();
-        Enumeration paramNames = request.getParameterNames();
+    public static Map<String, String> request2Json(HttpServletRequest request) {
+        Map<String, String> map = new HashMap<>();
+        Enumeration<String> paramNames = request.getParameterNames();
         while (paramNames.hasMoreElements()) {
-            String paramName = (String) paramNames.nextElement();
+            String paramName = paramNames.nextElement();
             String[] pv = request.getParameterValues(paramName);
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < pv.length; i++) {
@@ -170,9 +169,9 @@ public class ReflectUtil {
                     sb.append(pv[i]);
                 }
             }
-            requestJson.put(paramName, sb.toString());
+            map.put(paramName, sb.toString());
         }
-        return requestJson;
+        return map;
     }
 
 
