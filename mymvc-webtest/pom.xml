@@ -18,11 +18,11 @@
 			<artifactId>mymvc-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>druid</artifactId>
 			<version>1.1.22</version>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
