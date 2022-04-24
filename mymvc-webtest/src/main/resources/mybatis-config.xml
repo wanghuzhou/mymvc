@@ -9,6 +9,12 @@
     <settings>
         <!-- 全局映射器启用缓存 -->
         <setting name="cacheEnabled" value="true"/>
+        <!--
+            localCacheScope 取值有SESSION 和 STATEMENT。默认SESSION。
+            SESSION 情况下，会缓存一个会话中执行的所有查询。
+            STATEMENT 情况下，本地会话仅用在语句执行上，对相同的SqlSession的不同调用将不会共享数据
+         -->
+        <setting name="localCacheScope" value="STATEMENT"/>
         <!-- 查询时,关闭关联对象及时加载以提高性能 -->
         <setting name="lazyLoadingEnabled" value="false"/>
         <!-- 设置关联对象加载的形态,此处为按需加载字段(加载字段由SQL指定),不会加载关联表的所有字段,以提高性能 -->
